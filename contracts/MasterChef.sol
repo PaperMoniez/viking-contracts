@@ -47,12 +47,12 @@ contract MasterChef is Ownable {
     }
 
     // The EGG TOKEN!
-    PaperMoniezToken public viking;
+    PaperMoniezToken public moniez;
     // Dev address.
     address public devaddr;
     // EGG tokens created per block.
-    uint256 public vikingPerBlock;
-    // Bonus muliplier for early viking makers.
+    uint256 public moniezPerBlock;
+    // Bonus muliplier for early moniez makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
     // Deposit Fee address
     address public feeAddress;
@@ -71,16 +71,16 @@ contract MasterChef is Ownable {
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
 
     constructor(
-        PaperMoniezToken _viking,
+        PaperMoniezToken _moniez,
         address _devaddr,
         address _feeAddress,
-        uint256 _vikingPerBlock,
+        uint256 _moniesPerBlock,
         uint256 _startBlock
     ) public {
-        viking = _viking;
+        moniez = _moniez;
         devaddr = _devaddr;
         feeAddress = _feeAddress;
-        vikingPerBlock = _vikingPerBlock;
+        moniezPerBlock = _moniezPerBlock;
         startBlock = _startBlock;
     }
 
@@ -130,8 +130,8 @@ contract MasterChef is Ownable {
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-            uint256 vikingReward = multiplier.mul(vikingPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-            accEggPerShare = accEggPerShare.add(vikingReward.mul(1e12).div(lpSupply));
+            uint256 moniezReward = multiplier.mul(moniezPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+            accEggPerShare = accEggPerShare.add(moniezReward.mul(1e12).div(lpSupply));
         }
         return user.amount.mul(accEggPerShare).div(1e12).sub(user.rewardDebt);
     }
@@ -156,10 +156,10 @@ contract MasterChef is Ownable {
             return;
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-        uint256 vikingReward = multiplier.mul(vikingPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-        viking.mint(devaddr, vikingReward.div(10));
-        viking.mint(address(this), vikingReward);
-        pool.accEggPerShare = pool.accEggPerShare.add(vikingReward.mul(1e12).div(lpSupply));
+        uint256 moniezReward = multiplier.mul(moniezPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+        moniez.mint(devaddr, moniezReward.div(10));
+        moniez.mint(address(this), moniezReward);
+        pool.accEggPerShare = pool.accEggPerShare.add(moniezReward.mul(1e12).div(lpSupply));
         pool.lastRewardBlock = block.number;
     }
 
@@ -217,13 +217,13 @@ contract MasterChef is Ownable {
         emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
-    // Safe viking transfer function, just in case if rounding error causes pool to not have enough EGGs.
+    // Safe moniez transfer function, just in case if rounding error causes pool to not have enough EGGs.
     function safeEggTransfer(address _to, uint256 _amount) internal {
-        uint256 vikingBal = viking.balanceOf(address(this));
-        if (_amount > vikingBal) {
-            viking.transfer(_to, vikingBal);
+        uint256 moniezBal = moniez.balanceOf(address(this));
+        if (_amount > moniezBal) {
+            moniez.transfer(_to, moniezBal);
         } else {
-            viking.transfer(_to, _amount);
+            moniez.transfer(_to, _amount);
         }
     }
 
@@ -239,8 +239,8 @@ contract MasterChef is Ownable {
     }
 
     //Pancake has to add hidden dummy pools inorder to alter the emission, here we make it simple and transparent to all.
-    function updateEmissionRate(uint256 _vikingPerBlock) public onlyOwner {
+    function updateEmissionRate(uint256 _moniezPerBlock) public onlyOwner {
         massUpdatePools();
-        vikingPerBlock = _vikingPerBlock;
+        moniezPerBlock = _moniezPerBlock;
     }
 }
