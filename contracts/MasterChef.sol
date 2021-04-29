@@ -74,7 +74,7 @@ contract MasterChef is Ownable {
         PaperMoniezToken _moniez,
         address _devaddr,
         address _feeAddress,
-        uint256 _moniesPerBlock,
+        uint256 _moniezPerBlock,
         uint256 _startBlock
     ) public {
         moniez = _moniez;
